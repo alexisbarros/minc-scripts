@@ -1,0 +1,8 @@
+# Instalar o bundle
+gem install bundle
+
+# Instalar as dependencias
+bundle install
+
+# Rodar o script
+bundle exec ruby script.rb
