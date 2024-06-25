@@ -108,12 +108,23 @@ begin
     
     begin
       # Verificar se a tabela Anexos possui linhas
-      parecer_tem_anexos_value = true
+      parecer_anexos_value = []
       table = wait.until { driver.find_element(:id, "formDetalhaParecer:listaArquivosAnexosModoDetalharParecer") }
       rows = table.find_elements(:tag_name, 'tr')
-      parecer_tem_anexos_value = false  if rows.empty?
+      if !rows.empty?
+        rows.each do |row|
+          begin
+            # Encontrar o link dentro do span
+            link_element = row.find_element(:xpath, ".//td//a")
+            parecer_anexos_value << link_element.attribute('href')
+          rescue Selenium::WebDriver::Error::NoSuchElementError
+            # Se não encontrar, continuar para a próxima linha
+            next
+          end
+        end
+      end
     rescue Selenium::WebDriver::Error::NoSuchElementError, Selenium::WebDriver::Error::TimeoutError
-      parecer_tem_anexos_value = false
+      parecer_anexos_value = []
     end
 
     # Adicionar os dados extraídos à saída
@@ -124,7 +135,7 @@ begin
       ocorrencia_de_trilhas: ocorrencia_de_trilhas_value,
       parecer_situacao: parecer_situacao_value,
       parecer_descricao: parecer_descricao_value,
-      parecer_tem_anexos: parecer_tem_anexos_value,
+      parecer_anexos: parecer_anexos_value,
     }
 
     # Salvar o índice atual
